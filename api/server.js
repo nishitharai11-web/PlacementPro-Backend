@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const Application = require("./models/Application");
+const Application = require("../models/Application");
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
@@ -63,6 +63,4 @@ app.put("/applications/:id", async (req, res) => {
   }
 });
 
-app.listen(5000, "127.0.0.1", () => {
-  console.log("Server running on http://127.0.0.1:5000");
-});
+module.exports = app;
