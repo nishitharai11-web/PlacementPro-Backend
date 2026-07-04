@@ -7,65 +7,73 @@ const Application = require("../models/Application");
 
 const app = express();
 
+// MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch(console.error);
+  .catch((err) => console.error(err));
 
-app.use(
-  cors({
-    origin: [
-      "https://placement-pro-three-teal.vercel.app",
-      "http://localhost:5173"
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true
-  })
-);
-app.options("*", cors());
+// CORS
+const corsOptions = {
+  origin: [
+    "https://placement-pro-three-teal.vercel.app",
+    "http://localhost:5173",
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 
+// Test Route
 app.get("/", (req, res) => {
   res.send("PlacementPro Backend is Running 🚀");
 });
 
+// GET
 app.get("/applications", async (req, res) => {
   try {
     const applications = await Application.find();
-    res.json(applications);
+    res.status(200).json(applications);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
+// POST
 app.post("/applications", async (req, res) => {
   try {
     const application = new Application(req.body);
-    const saved = await application.save();
-    res.json(saved);
+    const savedApplication = await application.save();
+    res.status(201).json(savedApplication);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
+// PUT
 app.put("/applications/:id", async (req, res) => {
   try {
-    const updated = await Application.findByIdAndUpdate(
+    const updatedApplication = await Application.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
-    res.json(updated);
+
+    res.status(200).json(updatedApplication);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
+// DELETE
 app.delete("/applications/:id", async (req, res) => {
   try {
     await Application.findByIdAndDelete(req.params.id);
-    res.json({ message: "Deleted" });
+    res.status(200).json({ message: "Application Deleted!" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
