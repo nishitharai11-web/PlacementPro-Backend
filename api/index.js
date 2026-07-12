@@ -45,11 +45,19 @@ app.get("/applications", async (req, res) => {
 // POST Application
 app.post("/applications", async (req, res) => {
   try {
+    console.log("Received:", req.body);
+
     const application = new Application(req.body);
+
     const savedApplication = await application.save();
+
     res.status(201).json(savedApplication);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);   // 👈 This is important
+    res.status(500).json({
+      message: err.message,
+      error: err,
+    });
   }
 });
 
